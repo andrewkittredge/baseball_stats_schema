@@ -12,9 +12,16 @@ from baseball_stats_models import YearlyBattingStats, Team, Player
 
 def initialize_schema():
     engine_params = {'db_password' : db_password, 'db_name' : DB_NAME}
-    Session = create_engine(ENGINE_STRING % engine_params, echo=True)
+    engine = create_engine(ENGINE_STRING % engine_params, echo=True)
+    Session = sessionmaker(bind=engine)
 
-    player = YearlyBattingStats('not a real player', 'red sox', 2011)
+    session = Session()
+
+    batting_stats = YearlyBattingStats('not a real player', 'red sox', 2011)
+
+    session.add(batting_stats)
+
+    session.commit()
 
 
 def build_batting_stats_table():
