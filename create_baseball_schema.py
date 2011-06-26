@@ -1,11 +1,18 @@
-#! /usr/bin/python
+#! /Library/Frameworks/Python.framework/Versions/2.6/bin/python2.6
 
-from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey
+from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, create_engine
+from sqlalchemy.orm import sessionmaker
+import sys
 
-import baseball_reference
+DB_NAME='sql_alchemy_scratch'
 
-def create_tables():
-    metadata = MetaData()    
+ENGINE_STRING='mysql+mysqldb://root:%(db_password)s@localhost/%(db_name)s'
+
+from baseball_stats_models import YearlyBattingStats, Team, Player
+
+def initialize_schema():
+    engine_params = {'db_password' : db_password, 'db_name' : DB_NAME}
+    Session = create_engine(ENGINE_STRING % engine_params, echo=True)
 
 
 def build_batting_stats_table():
@@ -13,4 +20,13 @@ def build_batting_stats_table():
     age_column = Column('year', Integer),
     team_column = Column('Team', String(50)),
     league_column = Column('League', String(50)),
-    
+
+def main():
+    global db_password
+    db_password = sys.argv[1]
+    initialize_schema()
+
+    return 0
+
+if __name__ == '__main__':
+    sys.exit(main())
