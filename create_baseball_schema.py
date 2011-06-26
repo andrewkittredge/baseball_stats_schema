@@ -14,6 +14,8 @@ def initialize_schema():
     engine_params = {'db_password' : db_password, 'db_name' : DB_NAME}
     Session = create_engine(ENGINE_STRING % engine_params, echo=True)
 
+    player = YearlyBattingStats('not a real player', 'red sox', 2011)
+
 
 def build_batting_stats_table():
     year_column = Column('id', Integer, primary_key=True),

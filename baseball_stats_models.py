@@ -2,7 +2,7 @@
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, ForeignKey
 
 Base = declarative_base()
 
@@ -16,15 +16,14 @@ class YearlyBattingStats(Base):
     id = Column(Integer, primary_key=True)
     year = Column(Integer)
 
-    player = relationship('Player', 
-                               backref=backref('__tablename__',
-                               order_by=id)
-                               )
+    player_id = Column(Integer, ForeignKey('players.id'))
 
-    team = relationship('Team',
-                        backref=backref('__tablename__',
-                                        order_by=id)
-                        )
+    team_id = Column(Integer, ForeignKey('teams.id'))
+
+    def __init__(self, player, team, year):
+        self.year = year
+        self.team = team
+        self.player = player
 
 class Player(Base):
     '''Baseball players.
