@@ -1,29 +1,21 @@
 #! /Library/Frameworks/Python.framework/Versions/2.6/bin/python2.6
 
 from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, create_engine
-from sqlalchemy.orm import sessionmaker
 import sys
 
 from baseball_stats_models import YearlyBattingStats, Team, Player
 
-def initialize_schema():
-    engine = sql_alchemy_utils.create_engine()
-    session = sql_alchemy_utils.build_session(engine)
+import sql_alchemy_utils
 
-    batting_stats = YearlyBattingStats(2011)
+def write_player_and_stats(session, player, stats):
 
-    player = Player('joe schmo')
-
+    player = Player(player)
     session.add(player)
-
     session.commit()
 
-    print player.id
+    stats = YearlyBattingStats(2011, player)
 
-    batting_stats.player_id = player.id
-
-    session.add(batting_stats)
-
+    session.add(stats)
     session.commit()
 
 

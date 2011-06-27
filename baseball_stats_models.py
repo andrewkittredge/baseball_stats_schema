@@ -6,9 +6,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy import Column, Integer, String, ForeignKey, create_engine
 
-DB_NAME='sql_alchemy_scratch'
-
-ENGINE_STRING='mysql+mysqldb://root:%(db_password)s@localhost/%(db_name)s'
+from sql_alchemy_utils import build_engine
 
 Base = declarative_base()
 
@@ -22,11 +20,11 @@ class YearlyBattingStats(Base):
     id = Column(Integer, primary_key=True)
     year = Column(Integer)
 
-    player_id = Column(Integer, ForeignKey('players.id'))
+    player_id = Column(Integer, ForeignKey('players.id'), nullable=False)
 
-    def __init__(self, year):
+    def __init__(self, year, player):
         self.year = year
-        #self.player_id = Player(player)
+        self.player_id = player.id
 
 class Player(Base):
     '''Baseball players.
@@ -57,17 +55,20 @@ class Team(Base):
     def __init__(self, team_name):
         self.name = team_name
 
-
 def load_schema():
-    engine_params = {'db_password' : db_password, 'db_name' : DB_NAME}
-    engine = create_engine(ENGINE_STRING % engine_params, echo=True)
+    engine = build_engine(db_password)
+    Base.metadata.create_all(engine)
+
+def reload_schema(db_password):
+    engine = build_engine(db_password)
+    Base.metadata.bind = engine
+    Base.metadata.drop_all()
     Base.metadata.create_all(engine)
 
 def main():
     global db_password
     db_password = sys.argv[1]
     load_schema()
-
 
     return 0
 
