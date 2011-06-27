@@ -24,12 +24,9 @@ class YearlyBattingStats(Base):
 
     player_id = Column(Integer, ForeignKey('players.id'))
 
-    team_id = Column(Integer, ForeignKey('teams.id'))
-
-    def __init__(self, player, team, year):
+    def __init__(self, year):
         self.year = year
-        self.team = team
-        self.player = player
+        #self.player_id = Player(player)
 
 class Player(Base):
     '''Baseball players.
@@ -40,7 +37,12 @@ class Player(Base):
     __tablename__ = 'players'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(100))
+    #I'm sure there are multiple baseball players with the same name,
+    #not sure what the best way to avoid adding the same player twice is.
+    name = Column(String(100), unique=True)
+
+    def __init__(self, name):
+        self.name = name
 
 class Team(Base):
     '''Baseball teams.
@@ -52,6 +54,9 @@ class Team(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(50))
 
+    def __init__(self, team_name):
+        self.name = team_name
+
 
 def load_schema():
     engine_params = {'db_password' : db_password, 'db_name' : DB_NAME}
@@ -62,6 +67,7 @@ def main():
     global db_password
     db_password = sys.argv[1]
     load_schema()
+
 
     return 0
 
