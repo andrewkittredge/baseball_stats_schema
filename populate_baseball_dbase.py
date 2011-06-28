@@ -11,9 +11,9 @@ import sql_alchemy_utils
 
 from Source.Baseball_Reference_Scraping.baseball_reference import get_all_player_stats
 
-def write_player_and_stats(session, player, stats):
+def write_player_and_stats(session, _player, stats):
 
-    player = Player(player)
+    player = Player(_player)
     session.add(player)
     session.commit()
 
@@ -41,7 +41,8 @@ def main():
     session = sql_alchemy_utils.build_session(engine)
 
     for player, stats in get_all_player_stats():
-        write_player_and_stats(session, player, stats)
+        if stats: #Batters only, not getting pitchers now.
+            write_player_and_stats(session, player, stats)
 
     return 0
 
