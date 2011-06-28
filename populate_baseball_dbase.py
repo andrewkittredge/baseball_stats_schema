@@ -1,6 +1,8 @@
 #! /Library/Frameworks/Python.framework/Versions/2.6/bin/python2.6
 
 from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, create_engine
+
+from sqlalchemy.orm.exc import NoResultFound
 import sys
 
 from baseball_stats_models import YearlyBattingStats, Team, Player
@@ -15,11 +17,21 @@ def write_player_and_stats(session, player, stats):
     session.add(player)
     session.commit()
 
-    stats = YearlyBattingStats(2011, player)
+    for stats_dict in stats:
 
-    session.add(stats)
-    session.commit()
+        team_string = stats_dict['Team']
+        team_query = session.query(Team).filter(Team.name == team_string)
+        try:
+            team = team_query.one()
+        except NoResultFound:
+            team = Team(team_string)
+            session.add(team)
+            session.commit()
 
+        yearly_stats = YearlyBattingStats(player, team, **stats_dict)
+        
+        session.add(yearly_stats)
+        session.commit()
 
 def main():
     global db_password

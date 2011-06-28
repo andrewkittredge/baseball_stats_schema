@@ -16,15 +16,38 @@ class YearlyBattingStats(Base):
     '''
 
     __tablename__ = 'yearly_batting_stats'
-
     id = Column(Integer, primary_key=True)
-    year = Column(Integer)
 
     player_id = Column(Integer, ForeignKey('players.id'), nullable=False)
+    team_id = Column(Integer, ForeignKey('teams.id'), nullable=False)
 
-    def __init__(self, year, player):
-        self.year = year
+    player = relationship('Player', backref=backref('players', order_by=id))
+    team = relationship('Team', backref=backref('teams', order_by=id))
+
+    year = Column(Integer)
+    games_played_or_pitched = Column(Integer)
+    plate_appearances = Column(Integer)
+    at_bats = Column(Integer)
+    runs_scored_or_allowed = Column(Integer)
+    hits_or_hits_allowed = Column(Integer)
+    doubles = Column(Integer)
+    triples = Column(Integer)
+    home_runs = Column(Integer)
+
+
+    def __init__(self, player, team, **args):
+
         self.player_id = player.id
+        self.team_id = team.id
+        self.year = args['Year']
+        self.games_played_or_pitched = args['Games Played or Pitched']
+        self.plate_appearances = args['Plate Appearances']
+        self.at_bats = args['At Bats']
+        self.runs_scored_or_allowed = args['Runs Scored/Allowed']
+        self.hits_or_hits_allowed = args['Hits/Hits Allowed']
+        self.doubles = args['2B']
+        self.triples = args['3B']
+        self.homeruns = args['HR']
 
 class Player(Base):
     '''Baseball players.
@@ -63,12 +86,12 @@ def reload_schema(db_password):
     engine = build_engine(db_password)
     Base.metadata.bind = engine
     Base.metadata.drop_all()
-    Base.metadata.create_all(engine)
+    Base.metadata.create_all()
 
 def main():
     global db_password
     db_password = sys.argv[1]
-    load_schema()
+    reload_schema(db_password)
 
     return 0
 
